@@ -1,0 +1,22 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "account_carver0025_name": {
+            "defaultValue": "carver0025",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.VisualStudio/account",
+            "apiVersion": "2014-04-01-preview",
+            "name": "[parameters('account_carver0025_name')]",
+            "location": "centralus",
+            "properties": {
+                "AccountURL": "[concat('https://dev.azure.com/', parameters('account_carver0025_name'), '/')]"
+            }
+        }
+    ]
+}

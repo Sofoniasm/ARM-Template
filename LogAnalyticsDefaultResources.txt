@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "querypacks_DefaultQueryPack_name": {
+            "defaultValue": "DefaultQueryPack",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "microsoft.operationalInsights/querypacks",
+            "apiVersion": "2019-09-01",
+            "name": "[parameters('querypacks_DefaultQueryPack_name')]",
+            "location": "centralus",
+            "properties": {}
+        },
+        {
+            "type": "microsoft.operationalInsights/querypacks/queries",
+            "apiVersion": "2019-09-01",
+            "name": "[concat(parameters('querypacks_DefaultQueryPack_name'), '/04ab20e6-2c82-4c5c-9473-dc2a93a92832')]",
+            "dependsOn": [
+                "[resourceId('microsoft.operationalInsights/querypacks', parameters('querypacks_DefaultQueryPack_name'))]"
+            ],
+            "properties": {
+                "displayName": "FailedAPICalls",
+                "body": "// Failed operations \n// Calculate how many times operations failed, and how many users were impacted. \n// To create an alert for this query, click '+ New alert rule'\nrequests\n| where success == false\n| summarize failedCount=sum(itemCount), impactedUsers=dcount(user_Id) by operation_Name\n| order by failedCount desc",
+                "related": {
+                    "categories": [],
+                    "resourceTypes": [
+                        "microsoft.insights/components"
+                    ]
+                },
+                "tags": {
+                    "labels": []
+                }
+            }
+        }
+    ]
+}

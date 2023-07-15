@@ -1,0 +1,1126 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "servers_sd_scus_qa_mssql_server_name": {
+            "defaultValue": "sd-scus-qa-mssql-server",
+            "type": "String"
+        },
+        "storageAccounts_sqlvash5z7ga3fofhq_name": {
+            "defaultValue": "sqlvash5z7ga3fofhq",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Sql/servers",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[parameters('servers_sd_scus_qa_mssql_server_name')]",
+            "location": "southcentralus",
+            "kind": "v12.0",
+            "properties": {
+                "administratorLogin": "SDAdmin",
+                "version": "12.0",
+                "minimalTlsVersion": "None",
+                "publicNetworkAccess": "Enabled",
+                "restrictOutboundNetworkAccess": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2022-09-01",
+            "name": "[parameters('storageAccounts_sqlvash5z7ga3fofhq_name')]",
+            "location": "southcentralus",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "minimumTlsVersion": "TLS1_0",
+                "allowBlobPublicAccess": true,
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/advancedThreatProtectionSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/CreateIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/DbParameterization')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/DefragmentIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/DropIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/ForceLastGoodPlan')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/auditingPolicies",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Default')]",
+            "location": "South Central US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "auditingState": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/auditingSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "isManagedIdentityInUse": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/connectionPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/default')]",
+            "location": "southcentralus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "connectionType": "Default"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel')]",
+            "location": "southcentralus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "sku": {
+                "name": "Standard",
+                "tier": "Standard",
+                "capacity": 20
+            },
+            "kind": "v12.0,user",
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": 268435456000,
+                "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                "zoneRedundant": false,
+                "readScale": "Disabled",
+                "requestedBackupStorageRedundancy": "Geo",
+                "maintenanceConfigurationId": "/subscriptions/33a1efc6-8ad4-4bff-92a9-8545bac8a75f/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
+                "isLedgerOn": false,
+                "availabilityZone": "NoPreference"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel')]",
+            "location": "southcentralus",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "sku": {
+                "name": "Standard",
+                "tier": "Standard",
+                "capacity": 50
+            },
+            "kind": "v12.0,user",
+            "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": 32212254720,
+                "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+                "zoneRedundant": false,
+                "readScale": "Disabled",
+                "requestedBackupStorageRedundancy": "Geo",
+                "maintenanceConfigurationId": "/subscriptions/33a1efc6-8ad4-4bff-92a9-8545bac8a75f/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
+                "isLedgerOn": false,
+                "availabilityZone": "NoPreference"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advancedThreatProtectionSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/master/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingPolicies",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/master/Default')]",
+            "location": "South Central US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "auditingState": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/master/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/master/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/geoBackupPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/master/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/ledgerDigestUploads",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/master/Current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/master/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/master/Current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/master/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/devOpsAuditingSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "isAzureMonitorTargetEnabled": false,
+                "isManagedIdentityInUse": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/encryptionProtector",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "kind": "servicemanaged",
+            "properties": {
+                "serverKeyName": "ServiceManaged",
+                "serverKeyType": "ServiceManaged",
+                "autoRotationEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/extendedAuditingSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "isManagedIdentityInUse": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/AllowAllWindowsAzureIps')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Carver_temp')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Chrims Office')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/ClientIPAddress_2021-04-19_03:46:17')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/ClientIPAddress_2021-2-16_12-21-34')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/ClientIPAddress_2022-8-17_16-37-2')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/ClientIPAddress_2023-01-31_02:58:38')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/ClientIPAddress_2023-03-01_15-54-38')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Joaquin')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/MMS - Mark Office')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/MM-sofia-vpn')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/MM-varna-vpn')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Peter - Home 2-7-2023')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Ryan')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Ryan phone')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Ryan Phone 2')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Shawn')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/firewallRules",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Tefer-VPN  2-7-2023')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Sql/servers/keys",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/ServiceManaged')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "kind": "servicemanaged",
+            "properties": {
+                "serverKeyType": "ServiceManaged"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/securityAlertPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": true,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/sqlVulnerabilityAssessments",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('storageAccounts_sqlvash5z7ga3fofhq_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_sqlvash5z7ga3fofhq_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "allowPermanentDelete": false,
+                    "enabled": false
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('storageAccounts_sqlvash5z7ga3fofhq_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_sqlvash5z7ga3fofhq_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "protocolSettings": {
+                    "smb": {}
+                },
+                "cors": {
+                    "corsRules": []
+                },
+                "shareDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('storageAccounts_sqlvash5z7ga3fofhq_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_sqlvash5z7ga3fofhq_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('storageAccounts_sqlvash5z7ga3fofhq_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_sqlvash5z7ga3fofhq_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advancedThreatProtectionSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advancedThreatProtectionSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/CreateIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/CreateIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/DbParameterization')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/DbParameterization')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/DefragmentIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/DefragmentIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/DropIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/DropIndex')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/ForceLastGoodPlan')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/advisors",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/ForceLastGoodPlan')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "autoExecuteValue": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingPolicies",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/Default')]",
+            "location": "South Central US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "auditingState": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingPolicies",
+            "apiVersion": "2014-04-01",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/Default')]",
+            "location": "South Central US",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "auditingState": "Disabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "isManagedIdentityInUse": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/auditingSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "weeklyRetention": "PT0S",
+                "monthlyRetention": "PT0S",
+                "yearlyRetention": "PT0S",
+                "weekOfYear": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/backupLongTermRetentionPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "weeklyRetention": "PT0S",
+                "monthlyRetention": "PT0S",
+                "yearlyRetention": "PT0S",
+                "weekOfYear": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 7,
+                "diffBackupIntervalInHours": 24
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 7,
+                "diffBackupIntervalInHours": 24
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "auditActionsAndGroups": [],
+                "isStorageSecondaryKeyInUse": false,
+                "isAzureMonitorTargetEnabled": false,
+                "isManagedIdentityInUse": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/extendedAuditingSettings",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "retentionDays": 0,
+                "isAzureMonitorTargetEnabled": false,
+                "state": "Disabled",
+                "storageAccountSubscriptionId": "00000000-0000-0000-0000-000000000000"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/geoBackupPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/geoBackupPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/ledgerDigestUploads",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/Current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/ledgerDigestUploads",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/Current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/securityAlertPolicies",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Disabled",
+                "disabledAlerts": [
+                    ""
+                ],
+                "emailAddresses": [
+                    ""
+                ],
+                "emailAccountAdmins": false,
+                "retentionDays": 0
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/Current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/transparentDataEncryption",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/Current')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "state": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/QAStableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'QAStableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true,
+                    "emails": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/databases/vulnerabilityAssessments",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/StableDuel/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', parameters('servers_sd_scus_qa_mssql_server_name'), 'StableDuel')]",
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]"
+            ],
+            "properties": {
+                "recurringScans": {
+                    "isEnabled": false,
+                    "emailSubscriptionAdmins": true,
+                    "emails": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Sql/servers/vulnerabilityAssessments",
+            "apiVersion": "2022-08-01-preview",
+            "name": "[concat(parameters('servers_sd_scus_qa_mssql_server_name'), '/Default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('servers_sd_scus_qa_mssql_server_name'))]",
+                "[resourceId('Microsoft.Storage/StorageAccounts', parameters('storageAccounts_sqlvash5z7ga3fofhq_name'))]"
+            ],
+            "properties": {
+                "storageContainerPath": "[concat('https://', parameters('storageAccounts_sqlvash5z7ga3fofhq_name'), '.blob.core.windows.net/vulnerability-assessment/')]",
+                "recurringScans": {
+                    "isEnabled": true,
+                    "emailSubscriptionAdmins": true,
+                    "emails": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('storageAccounts_sqlvash5z7ga3fofhq_name'), '/default/sd-qadb-export022223')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_sqlvash5z7ga3fofhq_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_sqlvash5z7ga3fofhq_name'))]"
+            ],
+            "properties": {
+                "immutableStorageWithVersioning": {
+                    "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2022-09-01",
+            "name": "[concat(parameters('storageAccounts_sqlvash5z7ga3fofhq_name'), '/default/vulnerability-assessment')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_sqlvash5z7ga3fofhq_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_sqlvash5z7ga3fofhq_name'))]"
+            ],
+            "properties": {
+                "immutableStorageWithVersioning": {
+                    "enabled": false
+                },
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        }
+    ]
+}
